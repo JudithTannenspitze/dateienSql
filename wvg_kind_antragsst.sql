@@ -1,0 +1,87 @@
+--------------------------------------------------------
+--  Datei erstellt -Freitag-März-04-2022   
+--------------------------------------------------------
+--------------------------------------------------------
+--  DDL for Table WVG_KIND_ANTRAGSST
+--------------------------------------------------------
+
+  CREATE TABLE "WOHNUNG"."WVG_KIND_ANTRAGSST" 
+   (	"ID" NUMBER, 
+	"KDA_ATS_ID" NUMBER, 
+	"KDA_KD_ID" NUMBER, 
+	"CREATED_ON" TIMESTAMP (6), 
+	"CREATED_BY" VARCHAR2(255 BYTE), 
+	"MODIFIED_ON" TIMESTAMP (6), 
+	"MODIFIED_BY" VARCHAR2(255 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."ID" IS 'Primäre Schlüssel';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."KDA_ATS_ID" IS 'Fremdschlüssel zu Antragssteller';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."KDA_KD_ID" IS 'Fremdschlüssel Kind ';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."CREATED_ON" IS 'Timestamp Erstellung  Datensatz';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."CREATED_BY" IS 'Ersteller Datensatz';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."MODIFIED_ON" IS 'Timestamp Änderung  Datensatz';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_KIND_ANTRAGSST"."MODIFIED_BY" IS 'Benutzernamen v.  Änderer Datensatz';
+   COMMENT ON TABLE "WOHNUNG"."WVG_KIND_ANTRAGSST"  IS 'Verbindungstabelle (m:n)  Antragssteller Kind';
+REM INSERTING into WOHNUNG.WVG_KIND_ANTRAGSST
+SET DEFINE OFF;
+Insert into WOHNUNG.WVG_KIND_ANTRAGSST (ID,KDA_ATS_ID,KDA_KD_ID,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('3','10','3',to_timestamp('02.03.22 08:27:56,817773000','DD.MM.RR HH24:MI:SSXFF'),'JUDITH.BORNHAUPT',null,null);
+Insert into WOHNUNG.WVG_KIND_ANTRAGSST (ID,KDA_ATS_ID,KDA_KD_ID,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('1','1','1',to_timestamp('28.02.22 12:56:05,369900000','DD.MM.RR HH24:MI:SSXFF'),'JUDITH.BORNHAUPT',null,null);
+Insert into WOHNUNG.WVG_KIND_ANTRAGSST (ID,KDA_ATS_ID,KDA_KD_ID,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('2','4','2',to_timestamp('01.03.22 07:00:00,213672000','DD.MM.RR HH24:MI:SSXFF'),'JUDITH.BORNHAUPT',null,null);
+--------------------------------------------------------
+--  DDL for Index PRS_KDA
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "WOHNUNG"."PRS_KDA" ON "WOHNUNG"."WVG_KIND_ANTRAGSST" ("ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+--------------------------------------------------------
+--  DDL for Trigger TRIG_WVG_KIND_ANTRAGSST
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE TRIGGER "WOHNUNG"."TRIG_WVG_KIND_ANTRAGSST" 
+BEFORE INSERT OR UPDATE ON WVG_kind_antragsst
+FOR EACH ROW 
+BEGIN 
+IF :new.id is NULL
+THEN 
+ SELECT to_number(SEQ_WVG_kind_antragsst.nextval) INTO :new.id FROM dual;
+END IF;
+    IF inserting THEN
+        :new.created_on := localtimestamp;
+        :new.created_by := nvl(wwv_flow.g_user,user);
+    END IF;
+IF updating THEN
+:new.modified_on := localtimestamp;
+:new.modified_by := nvl(wwv_flow.g_user,user);
+    END IF;
+END;
+/
+ALTER TRIGGER "WOHNUNG"."TRIG_WVG_KIND_ANTRAGSST" ENABLE;
+--------------------------------------------------------
+--  Constraints for Table WVG_KIND_ANTRAGSST
+--------------------------------------------------------
+
+  ALTER TABLE "WOHNUNG"."WVG_KIND_ANTRAGSST" ADD CONSTRAINT "PRS_KDA" PRIMARY KEY ("ID")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table WVG_KIND_ANTRAGSST
+--------------------------------------------------------
+
+  ALTER TABLE "WOHNUNG"."WVG_KIND_ANTRAGSST" ADD CONSTRAINT "frk-wvg_kind_antragsst_ats_id" FOREIGN KEY ("KDA_ATS_ID")
+	  REFERENCES "WOHNUNG"."WVG_ANTRAGSSTELLER" ("ID") ON DELETE CASCADE ENABLE;
+  ALTER TABLE "WOHNUNG"."WVG_KIND_ANTRAGSST" ADD CONSTRAINT "frk_wvg_kind_antragsst_kin_id" FOREIGN KEY ("KDA_KD_ID")
+	  REFERENCES "WOHNUNG"."WVG_KIND" ("ID") ON DELETE CASCADE ENABLE;

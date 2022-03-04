@@ -1,0 +1,76 @@
+--------------------------------------------------------
+--  Datei erstellt -Freitag-März-04-2022   
+--------------------------------------------------------
+--------------------------------------------------------
+--  DDL for Table WVG_WOHNUNG
+--------------------------------------------------------
+
+  CREATE TABLE "WOHNUNG"."WVG_WOHNUNG" 
+   (	"ID" NUMBER, 
+	"WHG_NR_AUSHANG" NUMBER, 
+	"CREATED_ON" TIMESTAMP (6), 
+	"CREATED_BY" VARCHAR2(255 BYTE), 
+	"MODIFIED_ON" TIMESTAMP (6), 
+	"MODIFIED_BY" VARCHAR2(255 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+
+   COMMENT ON COLUMN "WOHNUNG"."WVG_WOHNUNG"."ID" IS 'Primäre Schlüssel';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_WOHNUNG"."WHG_NR_AUSHANG" IS 'Nummer Wohnungsaushang';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_WOHNUNG"."CREATED_ON" IS 'Timestamp Erstellung  Datensatz';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_WOHNUNG"."CREATED_BY" IS 'Ersteller Datensatz';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_WOHNUNG"."MODIFIED_ON" IS 'Timestamp Änderung Datensatz';
+   COMMENT ON COLUMN "WOHNUNG"."WVG_WOHNUNG"."MODIFIED_BY" IS 'Benutzernamen vom  Änderer Datensatz';
+   COMMENT ON TABLE "WOHNUNG"."WVG_WOHNUNG"  IS 'Wohnungsdaten der Antragssteller';
+REM INSERTING into WOHNUNG.WVG_WOHNUNG
+SET DEFINE OFF;
+Insert into WOHNUNG.WVG_WOHNUNG (ID,WHG_NR_AUSHANG,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('1','5',to_timestamp('28.02.22 12:09:15,587812000','DD.MM.RR HH24:MI:SSXFF'),'JUDITH.BORNHAUPT',to_timestamp('02.03.22 17:03:03,809272000','DD.MM.RR HH24:MI:SSXFF'),'JUDITH.BORNHAUPT');
+Insert into WOHNUNG.WVG_WOHNUNG (ID,WHG_NR_AUSHANG,CREATED_ON,CREATED_BY,MODIFIED_ON,MODIFIED_BY) values ('2','10',to_timestamp('01.03.22 11:47:46,113326000','DD.MM.RR HH24:MI:SSXFF'),'JUDITH.BORNHAUPT',null,null);
+--------------------------------------------------------
+--  DDL for Index PRIMARYKEYWOHNUNG
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "WOHNUNG"."PRIMARYKEYWOHNUNG" ON "WOHNUNG"."WVG_WOHNUNG" ("ID") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+--------------------------------------------------------
+--  DDL for Trigger TRIG_WVG_WOHNUNG
+--------------------------------------------------------
+
+  CREATE OR REPLACE EDITIONABLE TRIGGER "WOHNUNG"."TRIG_WVG_WOHNUNG" 
+BEFORE UPDATE OR INSERT ON WVG_WOHNUNG 
+FOR EACH ROW 
+BEGIN 
+IF :new.id is NULL
+THEN 
+ SELECT to_number(seq_wvg_wohnung.NEXTVAL) INTO :new.id FROM dual;
+END IF;
+    IF inserting THEN
+        :new.created_on := localtimestamp;
+        :new.created_by := nvl(wwv_flow.g_user,user);
+    END IF;
+IF updating THEN
+:new.modified_on := localtimestamp;
+:new.modified_by := nvl(wwv_flow.g_user,user);
+    END IF;
+END;
+/
+ALTER TRIGGER "WOHNUNG"."TRIG_WVG_WOHNUNG" ENABLE;
+--------------------------------------------------------
+--  Constraints for Table WVG_WOHNUNG
+--------------------------------------------------------
+
+  ALTER TABLE "WOHNUNG"."WVG_WOHNUNG" ADD CONSTRAINT "PRIMARYKEYWOHNUNG" PRIMARY KEY ("ID")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE;
